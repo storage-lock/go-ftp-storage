@@ -27,8 +27,14 @@ const StorageName = "ftp-storage"
 
 func (x *FTPStorage) GetName() string { return StorageName }
 
+// Capabilities 如实声明这个实现能提供什么。
+//
+// 当前 FTPStorage 是占位实现：所有读写方法都返回 ErrStorageCapabilityMissing
+// 或空值，没有真正的条件写，也没有可信的服务器时钟（GetTime 返回本机时间）。
+// FTP 协议本身也没有原子的 compare-and-swap 原语，因此**不声明任何用来建锁的能力**。
+// NewStorageLock 会拒绝在它上面创建锁，这才是正确行为。
 func (x *FTPStorage) Capabilities() []storage.StorageCapability {
-	return []storage.StorageCapability{storage.CapabilityReliableTime, storage.CapabilityWatch}
+	return nil
 }
 
 func (x *FTPStorage) Watch(ctx context.Context, lockId string) (<-chan *storage.LockInformation, error) {
